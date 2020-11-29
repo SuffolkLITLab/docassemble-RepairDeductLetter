@@ -1,0 +1,192 @@
+include:
+  - docassemble.MAVirtualCourt:basic-questions.yml
+---
+comment: |
+  The metadata section controls the tab title and saved interview title. You can delete this section if you include this YAML file in another YAML file.
+metadata:
+  title: |
+    Repair/Rent Deduction Letter
+  short title: |
+    Repair/Rent Deduction
+---
+comment: |
+  This section is used by MAVirtualCourts to control how some of the questions work.
+mandatory: True
+code: |
+  interview_metadata # make sure we initialize the object
+  if not defined("interview_metadata['Form_13__Repair_and_Deductions_Fields']"):
+    interview_metadata.initializeObject('Form_13__Repair_and_Deductions_Fields')
+  interview_metadata['Form_13__Repair_and_Deductions_Fields'].update({
+    'title': 'Repair/Rent Deduction Letter',
+    'short title': 'Repair/Rent Deduction',
+    'description': 'This form is used to put your landlord on notice that you will be deducting the cost of repairs from your rent total due to the fact your landlord has failed to remedy the repairs you informed them about within fourteen days of notification of the violations.',
+    'original_form': '',
+    'allowed courts': [
+      'Boston Municipal Court',
+      'District Court',
+      'Housing Court',
+      'Superior Court',
+    ],
+    'categories': [
+      'Housing',
+    ],
+    'logic block variable': 'Form_13__Repair_and_Deductions_Fields',
+    'attachment block variable': 'Form_13__Repair_and_Deductions_Fields_attachment',
+    'typical role': 'plaintiff',
+  })
+---
+features:
+  navigation: True
+---
+sections:
+  - review_Form_13__Repair_and_Deductions_Fields: Review your answers
+---
+id: interview_order_Form_13__Repair_and_Deductions_Fields
+code: |
+  # This is a placeholder to control logic flow in this interview
+
+  basic_questions_intro_screen 
+  Form_13__Repair_and_Deductions_Fields_intro
+  # Set the allowed courts for this interview
+  allowed_courts = interview_metadata["Form_13__Repair_and_Deductions_Fields"]["allowed courts"]
+  nav.set_section('review_Form_13__Repair_and_Deductions_Fields')
+  user_role = 'plaintiff'
+  Dates_of_each_violation
+  violations
+  # Set the answer file name.
+  set_parts(subtitle=str(users))
+  set_progress(11.11)
+  other_parties[0]
+  users[0].inspection_date
+  users[0].rent_amount
+  set_progress(22.22)
+  users[0].address.address
+  users[0].telephone_number
+  str(other_parties)
+  set_progress(33.33)
+  other_parties[0].address.address
+  users[0].repair_materials
+  users[0]
+  set_progress(44.44)
+  users[0].repair_bill
+  # Save (anonymized) interview statistics.
+  store_variables_snapshot(data={'zip': users[0].address.zip})
+  Form_13__Repair_and_Deductions_Fields_preview_question # Pre-canned preview screen
+  basic_questions_signature_flow
+  Form_13__Repair_and_Deductions_Fields = True
+---
+comment: |
+  This question is used to introduce your interview. Please customize
+id: Repair/Rent Deduction Letter
+continue button field: Form_13__Repair_and_Deductions_Fields_intro
+question: |
+  Repair/Rent Deduction Letter
+subquestion: |
+  This form is used to put your landlord on notice that you will be deducting the cost of repairs from your rent total due to the fact your landlord has failed to remedy the repairs you informed them about within fourteen days of notification of the violations.
+---
+id: Review your form before you sign it
+continue button field: Form_13__Repair_and_Deductions_Fields_preview_question
+question: |
+  Review your form before you sign it
+subquestion: |
+  Here is a preview of the form you'll sign on the next page. 
+  
+   ${ pdf_concatenate(Form_13__Repair_and_Deductions_Fields_attachment['preview'], filename='Form_13__Repair_and_Deductions_Fields.pdf')}
+---
+id: Date s of each violation
+continue button field: Dates_of_each_violation
+question: |
+  Date(s) of each violation
+subquestion: |
+  Please list the date(s) of when each violation(s)
+fields:
+  - 'What date(s) did the violations arise?': violation
+    datatype: date
+---
+id: List of violation s
+question: |
+  List of violation(s)
+subquestion: |
+  Please list each violation(s) that your landlord has failed to remedy.
+fields:
+  - 'Please list the violations': violations
+    input type: area
+---
+progress: 100
+mandatory: True
+id: Your form is ready to download and file
+question: |
+  Your form is ready to download and file
+subquestion: |
+  Thank you ${users}. Your form is ready to download and deliver.
+  
+  Below is a preview of your form.
+  
+  ${pdf_concatenate(Form_13__Repair_and_Deductions_Fields_attachment['final'], filename='Form_13__Repair_and_Deductions_Fields.pdf') }
+need: Form_13__Repair_and_Deductions_Fields
+attachment code: Form_13__Repair_and_Deductions_Fields_attachment['final']
+---
+objects:
+  - Form_13__Repair_and_Deductions_Fields_attachment: DADict
+---
+attachment:
+    variable name: Form_13__Repair_and_Deductions_Fields_attachment[i]
+    name: Repair/Rent Deduction
+    filename: RepairRent_Deduction
+    docx template file: Form_13_-_Repair_and_Deductions_Fields.docx
+---
+id: Form_13__Repair_and_Deductions_Fields review screen
+event: review_Form_13__Repair_and_Deductions_Fields
+question: |
+  Placeholder Review Screen
+subquestion: |
+  Edit your answers below
+review: 
+  - Edit: violation
+    button: |
+      What date(s) did the violations arise?:
+      ${ violation.format() }
+  - Edit: violations
+    button: |
+      Please list the violations:
+      > ${ single_paragraph(violations) }
+  - Edit: other_parties[0].name.first
+    button: |
+      other_parties[0]:
+      ${ other_parties[0] }
+  - Edit: users[0].inspection_date
+    button: |
+      users[0].inspection_date:
+      ${ users[0].inspection_date }
+  - Edit: users[0].rent_amount
+    button: |
+      users[0].rent_amount:
+      ${ users[0].rent_amount }
+  - Edit: users[0].address.address
+    button: |
+      users[0].address.address:
+      ${ users[0].address.address }
+  - Edit: users[0].telephone_number
+    button: |
+      users[0].telephone_number:
+      ${ users[0].telephone_number }
+  - Edit: other_parties[0].name.first
+    button: |
+      other_parties:
+      ${ other_parties }
+  - Edit: other_parties[0].address.address
+    button: |
+      other_parties[0].address.address:
+      ${ other_parties[0].address.address }
+  - Edit: users[0].repair_materials
+    button: |
+      users[0].repair_materials:
+      ${ users[0].repair_materials }
+  - Edit: users[0].name.first
+    button: |
+      users[0]:
+      ${ users[0] }
+  - Edit: users[0].repair_bill
+    button: |
+      users[0].repair_bill:
+      ${ users[0].repair_bill }
