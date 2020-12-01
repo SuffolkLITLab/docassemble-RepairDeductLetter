@@ -45,7 +45,7 @@ def find_package_data(where='.', package='', exclude=standard_exclude, exclude_d
 setup(name='docassemble.RepairDeductLetter',
       version='0.0.1',
       description=('A docassemble extension.'),
-      long_description='# docassemble.RepairDeductLetter\n\nA docassemble extension.\n\n## Author\n\nobouche@suffolk.edu\n\n',
+      long_description='# docassemble.RepairDeductLetter\r\n\r\nThis is a rent and deduct letter.\r\n\r\n## Author\r\n\r\nobouche@suffolk.edu\r\n\r\n',
       long_description_content_type='text/markdown',
       author='',
       author_email='obouche@suffolk.edu',

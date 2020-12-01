@@ -1,6 +1,6 @@
 # docassemble.RepairDeductLetter
 
-A docassemble extension.
+This is a rent and deduct letter.
 
 ## Author
 
