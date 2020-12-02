@@ -1,0 +1,210 @@
+include:
+  - docassemble.MAVirtualCourt:basic-questions.yml
+---
+comment: |
+  The metadata section controls the tab title and saved interview title. You can delete this section if you include this YAML file in another YAML file.
+metadata:
+  title: |
+    Tenant Repair and Deduct Letter
+  short title: |
+    Repair and Deduct Letter
+---
+comment: |
+  This section is used by MAVirtualCourts to control how some of the questions work.
+mandatory: True
+code: |
+  interview_metadata # make sure we initialize the object
+  if not defined("interview_metadata['Repair_and_Deduct_Letter']"):
+    interview_metadata.initializeObject('Repair_and_Deduct_Letter')
+  interview_metadata['Repair_and_Deduct_Letter'].update({
+    'title': 'Tenant Repair and Deduct Letter',
+    'short title': 'Repair and Deduct Letter',
+    'description': 'This letter is created to...',
+    'original_form': 'https://www.masslegalhelp.org/housing/lt1-form-13-repair-deduct.pdf',
+    'allowed courts': [
+      'Boston Municipal Court',
+      'District Court',
+      'Housing Court',
+      'Superior Court',
+    ],
+    'categories': [
+      'Housing',
+    ],
+    'logic block variable': 'Repair_and_Deduct_Letter',
+    'attachment block variable': 'Repair_and_Deduct_Letter_attachment',
+    'typical role': 'plaintiff',
+  })
+---
+features:
+  navigation: True
+---
+sections:
+  - review_Repair_and_Deduct_Letter: Review your answers
+---
+objects:
+  - users: PeopleList.using(ask_number=True, target_number=1)
+  - other_parties: PeopleList.using(ask_number=True, target_number=1)
+---
+id: interview_order_Repair_and_Deduct_Letter
+code: |
+  # This is a placeholder to control logic flow in this interview
+
+  basic_questions_intro_screen 
+  Repair_and_Deduct_Letter_intro
+  # Set the allowed courts for this interview
+  allowed_courts = interview_metadata["Repair_and_Deduct_Letter"]["allowed courts"]
+  nav.set_section('review_Repair_and_Deduct_Letter')
+  user_role = 'plaintiff'
+  Date_of_Inspection_by_Local_Health_Board
+  Violations_Found_By_Local_Health_Board
+  rent_amount
+  set_progress(12.5)
+  repair_material_labor
+  # Set the answer file name.
+  set_parts(subtitle=str(users))
+  users[0].address.address
+  set_progress(25.0)
+  other_parties[0]
+  users[0]
+  str(other_parties)
+  set_progress(37.5)
+  other_parties[0].address.address
+  # Save (anonymized) interview statistics.
+  store_variables_snapshot(data={'zip': users[0].address.zip})
+  Repair_and_Deduct_Letter_preview_question # Pre-canned preview screen
+  basic_questions_signature_flow
+  Repair_and_Deduct_Letter = True
+---
+comment: |
+  This question is used to introduce your interview. Please customize
+id: Tenant Repair and Deduct Letter
+continue button field: Repair_and_Deduct_Letter_intro
+question: |
+  Tenant Repair and Deduct Letter
+subquestion: |
+  This letter is created by tenants for their landlords acting as a notification device explaining to their landlords that they will repair and deduct the necessary issue(s) on or within their rental property. 
+---
+id: Review your form before you sign it
+continue button field: Repair_and_Deduct_Letter_preview_question
+question: |
+  Review your form before you sign it
+subquestion: |
+  Here is a preview of the form you'll sign on the next page. 
+  
+   ${ pdf_concatenate(Repair_and_Deduct_Letter_attachment['preview'], filename='Repair_and_Deduct_Letter.pdf')}
+---
+id: Date of Inspection by Local Health Board
+continue button field: Date_of_Inspection_by_Local_Health_Board
+question: |
+  Date of Inspection by Local Health Board
+subquestion: |
+  On approximately what day did the local health board inspect your rented property?
+fields:
+  - 'Date of Inspection by Local Health Board': inspection_date
+    datatype: date
+---
+id: Violations Found By Local Health Board
+continue button field: Violations_Found_By_Local_Health_Board
+question: |
+  Violations Found By Local Health Board
+subquestion: |
+  What issue(s) did the local health board find within or on your rented property?
+fields:
+  - 'Violation': violation
+    input type: area
+  - 'Violations': violations
+    input type: area
+---
+id: Rent Amount
+question: |
+  Rent Amount
+subquestion: |
+  What amount of money do you pay your landlord?
+fields:
+  - 'Current Rent Amount Paid': rent_amount
+---
+id: Repair and Labor Deductions
+question: |
+  Repair and Labor Deductions
+subquestion: |
+  Describe the materials purchased and labor performed on your rented property to fix issue(s) experienced.
+fields:
+  - 'Paid Repair Materials and Labor': repair_material_labor
+    input type: area
+---
+id: landlords name
+question: |
+  What is your landlord's name?
+fields:
+  - Landlord's full name: other_parties[0].name.first
+---
+progress: 100
+mandatory: True
+id: Your form is ready to download and file
+question: |
+  Your form is ready to download and file
+subquestion: |
+  Thank you ${users}. Your form is ready to download and deliver.
+  
+  Below is a preview of your form.
+  
+  ${pdf_concatenate(Repair_and_Deduct_Letter_attachment['final'], filename='Repair_and_Deduct_Letter.pdf') }
+need: Repair_and_Deduct_Letter
+attachment code: Repair_and_Deduct_Letter_attachment['final']
+---
+objects:
+  - Repair_and_Deduct_Letter_attachment: DADict
+---
+attachment:
+    variable name: Repair_and_Deduct_Letter_attachment[i]
+    name: Repair and Deduct Letter
+    filename: Repair_and_Deduct_Letter
+    docx template file: Form_13_-_Repair_and_Deductions_Fields.docx
+---
+id: Repair_and_Deduct_Letter review screen
+event: review_Repair_and_Deduct_Letter
+question: |
+  Placeholder Review Screen
+subquestion: |
+  Edit your answers below
+review: 
+  - Edit: repair_material_labor
+    button: |
+      Paid Repair Materials and Labor:
+      > ${ single_paragraph(repair_material_labor) }
+  - Edit: rent_amount
+    button: |
+      Current Rent Amount Paid:
+      ${ rent_amount }
+  - Edit: inspection_date
+    button: |
+      Date of Inspection by Local Health Board:
+      ${ inspection_date.format() }
+  - Edit: violation
+    button: |
+      Violation:
+      > ${ single_paragraph(violation) }
+  - Edit: violations
+    button: |
+      Violations:
+      > ${ single_paragraph(violations) }
+  - Edit: users[0].address.address
+    button: |
+      users[0].address.address:
+      ${ users[0].address.address }
+  - Edit: other_parties[0].name.first
+    button: |
+      other_parties[0]:
+      ${ other_parties[0] }
+  - Edit: users[0].name.first
+    button: |
+      users[0]:
+      ${ users[0] }
+  - Edit: other_parties[0].name.first
+    button: |
+      other_parties:
+      ${ other_parties }
+  - Edit: other_parties[0].address.address
+    button: |
+      other_parties[0].address.address:
+      ${ other_parties[0].address.address }
