@@ -9,6 +9,9 @@ metadata:
   short title: |
     Repair and Deduct Letter
 ---
+code: |
+  interview_short_title = "Tell your landlord you will deduct the cost of repairs from your rent"
+---
 comment: |
   This section is used by MAVirtualCourts to control how some of the questions work.
 mandatory: True
